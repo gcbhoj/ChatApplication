@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { AuthContext } from "../Context/AuthContext";
+import { useContext } from "react";
 
 const Navbar = () => {
+  const { user, logOutUser } = useContext(AuthContext);
   return (
     <div className="border-2 m-1 flex flex-wrap justify-between">
       <Link to="/">
@@ -8,14 +11,29 @@ const Navbar = () => {
           Chat App
         </h2>
       </Link>
-      <span className="flex items-center font-[Roboto]">Logged in as hana</span>
+      {user && (
+        <span className="flex items-center font-[Roboto]">{user.name}</span>
+      )}
+
       <div className="flex flex-row m-1 border-2 justify-center items-center">
-        <Link to="/login" className="m-1 font-[Roboto]">
-          Login
-        </Link>
-        <Link to="/signup" className="m-1 font-[Roboto]">
-          Signup
-        </Link>
+        {user && (
+          <>
+            <Link className="m-1 font-[Roboto] " onClick={() => logOutUser()}>
+              Logout
+            </Link>
+          </>
+        )}
+
+        {!user && (
+          <>
+            <Link to="/login" className="m-1 font-[Roboto]">
+              Login
+            </Link>
+            <Link to="/signup" className="m-1 font-[Roboto]">
+              Signup
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

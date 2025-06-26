@@ -1,4 +1,4 @@
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { baseUrl, postRequest } from "../Services/UserServices";
 
 export const AuthContext = createContext();
@@ -12,9 +12,26 @@ export const AuthContextProvider = ({ children }) => {
     email: "",
     password: "",
   });
+  const [logInError, setlogInError] = useState(null);
+  const [islogInLoading, setIslogInLoading] = useState(false);
+  const [logInInfo, setlogInInfo] = useState({
+    email: "",
+    password: "",
+  });
+
+  console.log("Users", user)
+  console.log("LoginInfo:", logInInfo)
+  useEffect(() => {
+    const user = localStorage.getItem("User");
+
+    setUser(JSON.parse(user));
+  }, []);
 
   const updateRegisterInfo = useCallback((info) => {
     setRegisterInfo(info);
+  }, []);
+  const updateLogInInfo = useCallback((info) => {
+    setlogInInfo(info);
   }, []);
 
   const registerUser = useCallback(
@@ -49,6 +66,33 @@ export const AuthContextProvider = ({ children }) => {
     [registerInfo]
   );
 
+  const logOutUser = useCallback(() => {
+    localStorage.removeItem("User");
+    setUser(null);
+  }, []);
+
+  const logInUser = useCallback(
+    async (e) => {
+      if (e) e.preventDefault();
+
+      setIslogInLoading(true);
+      setlogInError(null);
+      const response = await postRequest(
+        `${baseUrl}/users/login`,
+        JSON.stringify(logInInfo)
+      );
+      setIslogInLoading(false);
+
+      if (response.error) {
+        return setlogInError(response);
+      }
+
+      localStorage.setItem("User", JSON.stringify(response));
+      setUser(response);
+    },
+    [logInInfo]
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -58,6 +102,12 @@ export const AuthContextProvider = ({ children }) => {
         registerUser,
         registerError,
         isRegisterLoading,
+        logOutUser,
+        logInUser,
+        updateLogInInfo,
+        logInError,
+        islogInLoading,
+        logInInfo
       }}
     >
       {children}
