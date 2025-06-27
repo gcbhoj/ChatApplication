@@ -4,13 +4,15 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const userRoute = require("./routes/userRoutes.js")
 const chatRoute = require("./routes/chatRoutes.js")
+const messageRoute = require("./routes/messageRoutes.js")
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use("/api/users", userRoute)
-app.use("/api/chats",chatRoute)
+app.use("/api/chats", chatRoute)
+app.use("/api/messages",messageRoute)
 
 
 const port = process.env.PORT || 5000;
